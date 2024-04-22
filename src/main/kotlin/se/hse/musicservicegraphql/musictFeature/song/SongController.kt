@@ -1,10 +1,11 @@
 package se.hse.musicservicegraphql.musictFeature.song
 
+import org.springframework.graphql.data.method.annotation.BatchMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
-import org.springframework.graphql.data.method.annotation.SchemaMapping
 import org.springframework.stereotype.Controller
 import se.hse.musicservicegraphql.musictFeature.playlist.Playlist
 import se.hse.musicservicegraphql.musictFeature.playlist.PlaylistRepository
+import java.util.stream.Collectors
 
 @Controller
 class SongController(private val songRepository: SongRepository, private val playlistRepository: PlaylistRepository) {
@@ -15,14 +16,35 @@ class SongController(private val songRepository: SongRepository, private val pla
         return songRepository.findAll()
     }
 
-//    @SchemaMapping(typeName = "Song")
-//    fun playlist(song: Song): Playlist? {
-//        println("DEBUG: Retrieve playlist of song ${song.title} by id")
-//        if (song.playlistId != null) {
-//            return playlistRepository.findById(song.playlistId!!).orElse(null)
+    @BatchMapping
+    fun playlist(songs: List<Song>): Map<Song, Playlist?> {
+
+        // A kinda better approach
+
+        println("DEBUG: Retrieve playlists for all songs")
+        val map: MutableMap<Song, Playlist?> = HashMap<Song, Playlist?>()
+        val allPlaylistIDs = songs.map { song: Song -> song.playlistId }
+        val playlists = playlistRepository.findAllById(allPlaylistIDs)
+        songs.forEach { song: Song ->
+            val tmp = playlists.firstOrNull { it.id == song.playlistId}
+            if (tmp != null) {
+                map[song] = tmp
+            }
+        }
+
+        return map
+
+        // A solution that seems to work, but it actually doesn't
+//        return songs.associateBy({it},{ it ->
+//            if (it.playlistId != null) {
+//                 playlistRepository.findById(it.playlistId!!).orElse(null)
+//            } else {
+//                null
+//            }
 //        }
-//
-//        return null
-//    }
+//        )
+
+
+    }
 
 }

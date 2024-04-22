@@ -20,8 +20,5 @@ data class Song(
     @Column(name = "playlist_id", insertable = false, updatable = false)
     var playlistId: Long?,
 
-    @ManyToOne
-    @JoinColumn(name = "playlist_id")
-    var playlist: Playlist? = null
 
 )
