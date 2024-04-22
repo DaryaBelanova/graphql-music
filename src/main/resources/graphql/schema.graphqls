@@ -1,10 +1,12 @@
+scalar Long
+
 type Query {
     songs: [Song]!
     playlists: [Playlist]!
 }
 
 type Song {
-    id: ID!
+    id: Long!
     title: String!
     artist: String!
     playlistId: Int
@@ -12,7 +14,25 @@ type Song {
 }
 
 type Playlist {
-    id: ID!
+    id: Long!
     title: String!
     imageUrl: String
 }
+
+# Add mutation example
+# DataLoader? Wtf is this?
+# Instrumentation and controlling the depth
+# Subscriptions
+# Custom types?
+
+
+# Task example
+# Fix the one-to-many to many-to-many (a song can be added to multiple playlists)
+# Add mutation to add song to a playlist
+
+
+# For tuesday:
+# Pagination
+# Connecting several datasources to the application
+# Custom types
+# Subscriptions?
