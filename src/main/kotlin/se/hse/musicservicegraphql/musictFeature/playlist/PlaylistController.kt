@@ -8,7 +8,7 @@ class PlaylistController(private val playlistRepository: PlaylistRepository) {
 
     @QueryMapping
     fun playlists(): List<Playlist> {
-        println("DEBUG: ")
+        println("DEBUG: Select all playlists from DB")
         return playlistRepository.findAll()
     }
 

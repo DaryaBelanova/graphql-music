@@ -10,7 +10,9 @@ import graphql.language.OperationDefinition
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
+import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.BatchMapping
+import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
 import se.hse.musicservicegraphql.musictFeature.playlist.Playlist
@@ -22,8 +24,14 @@ class SongController(private val songRepository: SongRepository, private val pla
 
     @QueryMapping
     fun songs(): List<Song> {
-        println("DEBUG: ")
+        println("DEBUG: Select all songs from DB")
         return songRepository.findAll()
+    }
+
+    @MutationMapping
+    fun addSong(@Argument title: String, @Argument artist: String): Song {
+        println("DEBUG: Insert new song into DB")
+        return songRepository.save(Song(title = title, artist = artist, playlistId = null))
     }
 
     @BatchMapping
@@ -33,6 +41,8 @@ class SongController(private val songRepository: SongRepository, private val pla
 
         println("DEBUG: Retrieve playlists for all songs")
         val map: MutableMap<Song, Playlist?> = HashMap<Song, Playlist?>()
+
+        // Trying to find all playlists by the ids (a single request to DB)
         val allPlaylistIDs = songs.map { song: Song -> song.playlistId }
         val playlists = playlistRepository.findAllById(allPlaylistIDs)
         songs.forEach { song: Song ->
