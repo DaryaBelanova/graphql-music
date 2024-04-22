@@ -17,7 +17,7 @@ data class Song(
 
     val artist: String,
 
-    @Column(name = "playlist_id", insertable = false, updatable = false)
+    @Column(name = "playlist_id")
     var playlistId: Long?,
 
 

@@ -2,12 +2,14 @@ scalar Long
 
 type Query {
     songs: [Song]!
-    # song(id: Long): Song
+    song(id: Long): Song
     playlists: [Playlist]!
 }
 
 type Mutation {
     addSong(title: String, artist: String): Song
+    addSongBatch(songs: [SongsInput]): [Song]!
+    addSongToPlaylist(id: Long, playlistId: Long): Song
 }
 
 type Song {
@@ -16,6 +18,12 @@ type Song {
     artist: String!
     playlistId: Int
     playlist: Playlist
+}
+
+input SongsInput {
+    title: String!
+    artist: String!
+    playlistId: Int
 }
 
 type Playlist {

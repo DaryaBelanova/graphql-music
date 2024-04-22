@@ -28,10 +28,38 @@ class SongController(private val songRepository: SongRepository, private val pla
         return songRepository.findAll()
     }
 
+    @QueryMapping
+    fun song(@Argument id: Long): Song? {
+        println("DEBUG: Select a single song from DB")
+        return songRepository.findById(id).orElse(null)
+    }
+
     @MutationMapping
     fun addSong(@Argument title: String, @Argument artist: String): Song {
         println("DEBUG: Insert new song into DB")
         return songRepository.save(Song(title = title, artist = artist, playlistId = null))
+    }
+
+    @MutationMapping
+    fun addSongBatch(@Argument songs: List<SongInput>): List<Song> {
+        println("DEBUG: Insert batch of songs into DB")
+        return songRepository.saveAll(songs.map { it -> Song(title = it.title, artist = it.artist, playlistId = it.playlistId) })
+    }
+
+    @MutationMapping
+    fun addSongToPlaylist(@Argument id: Long, @Argument playlistId: Long): Song? {
+        println("DEBUG: Update playlist id in song")
+
+        val song =  songRepository.findById(id)
+
+        if (song.isEmpty || playlistRepository.findById(playlistId).isEmpty) {
+            println("DEBUG: Something was empty")
+            return song.orElse(null)
+        }
+
+        song.get().playlistId = playlistId
+
+        return songRepository.save(song.get())
     }
 
     @BatchMapping
