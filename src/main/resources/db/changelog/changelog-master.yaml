@@ -7,3 +7,7 @@ databaseChangeLog:
       file: db/changelog/changeset/fill-songs.sql
   - include:
       file: db/changelog/changeset/fill-playlists.sql
+  - include:
+      file: db/changelog/changeset/create-song_playlist-table.yaml
+  - include:
+      file: db/changelog/changeset/fill-song_playlist.sql

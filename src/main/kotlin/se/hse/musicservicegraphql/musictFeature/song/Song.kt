@@ -17,8 +17,11 @@ data class Song(
 
     val artist: String,
 
-    @Column(name = "playlist_id")
-    var playlistId: Long?,
-
-
+    @ManyToMany()
+    @JoinTable(
+        name = "song_playlist",
+        joinColumns = [JoinColumn(name = "song_id")],
+        inverseJoinColumns = [JoinColumn(name = "playlist_id")]
+    )
+    var playlists: MutableList<Playlist> = mutableListOf()
 )

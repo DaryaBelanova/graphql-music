@@ -10,6 +10,7 @@ import graphql.language.OperationDefinition
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
+import org.springframework.data.domain.PageRequest
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.BatchMapping
 import org.springframework.graphql.data.method.annotation.MutationMapping
@@ -29,6 +30,13 @@ class SongController(private val songRepository: SongRepository, private val pla
     }
 
     @QueryMapping
+    fun pagedSongs(@Argument page: Int, @Argument size: Int): List<Song> {
+        println("DEBUG: Select all songs from DB with pagination")
+        var req = PageRequest.of(page, size)
+        return songRepository.findAll(req).toList()
+    }
+
+    @QueryMapping
     fun song(@Argument id: Long): Song? {
         println("DEBUG: Select a single song from DB")
         return songRepository.findById(id).orElse(null)
@@ -37,62 +45,6 @@ class SongController(private val songRepository: SongRepository, private val pla
     @MutationMapping
     fun addSong(@Argument title: String, @Argument artist: String): Song {
         println("DEBUG: Insert new song into DB")
-        return songRepository.save(Song(title = title, artist = artist, playlistId = null))
+        return songRepository.save(Song(title = title, artist = artist, playlists = mutableListOf()))
     }
-
-    @MutationMapping
-    fun addSongBatch(@Argument songs: List<SongInput>): List<Song> {
-        println("DEBUG: Insert batch of songs into DB")
-        return songRepository.saveAll(songs.map { it -> Song(title = it.title, artist = it.artist, playlistId = it.playlistId) })
-    }
-
-    @MutationMapping
-    fun addSongToPlaylist(@Argument id: Long, @Argument playlistId: Long): Song? {
-        println("DEBUG: Update playlist id in song")
-
-        val song =  songRepository.findById(id)
-
-        if (song.isEmpty || playlistRepository.findById(playlistId).isEmpty) {
-            println("DEBUG: Something was empty")
-            return song.orElse(null)
-        }
-
-        song.get().playlistId = playlistId
-
-        return songRepository.save(song.get())
-    }
-
-    @BatchMapping
-    fun playlist(songs: List<Song>): Map<Song, Playlist?> {
-
-        // A kinda better approach
-
-        println("DEBUG: Retrieve playlists for all songs")
-        val map: MutableMap<Song, Playlist?> = HashMap<Song, Playlist?>()
-
-        // Trying to find all playlists by the ids (a single request to DB)
-        val allPlaylistIDs = songs.map { song: Song -> song.playlistId }
-        val playlists = playlistRepository.findAllById(allPlaylistIDs)
-        songs.forEach { song: Song ->
-            val tmp = playlists.firstOrNull { it.id == song.playlistId}
-            if (tmp != null) {
-                map[song] = tmp
-            }
-        }
-
-        return map
-
-        // A solution that seems to work, but it actually doesn't
-//        return songs.associateBy({it},{ it ->
-//            if (it.playlistId != null) {
-//                 playlistRepository.findById(it.playlistId!!).orElse(null)
-//            } else {
-//                null
-//            }
-//        }
-//        )
-
-
-    }
-
 }

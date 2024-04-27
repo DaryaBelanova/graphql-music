@@ -16,6 +16,6 @@ data class Playlist(
     @Column(name="image_url")
     val imageUrl: String?,
 
-    @OneToMany(mappedBy = "playlistId", fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     var songs: MutableList<Song> = mutableListOf<Song>()
 )

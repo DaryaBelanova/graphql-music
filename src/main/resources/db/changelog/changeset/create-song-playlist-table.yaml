@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-song_playlist-relationship-table
+      author: lucy
+      changes:
+          - createTable:
+              tableName: song_playlist
+              columns:
+                - column:
+                    name: song_id
+                    type: bigint
+                - column:
+                    name: playlist_id
+                    type: bigint
